@@ -193,6 +193,7 @@ func (a *apiClient) viewTags(c echo.Context) error {
 	if namespace != "library" {
 		repoPath = fmt.Sprintf("%s/%s", namespace, repo)
 	}
+        repoPath, _ = url.PathUnescape(repoPath)
 
 	tags := a.client.Tags(repoPath)
 	deleteAllowed := a.checkDeletePermission(c.Request().Header.Get("X-WEBAUTH-USER"))
@@ -202,7 +203,6 @@ func (a *apiClient) viewTags(c echo.Context) error {
 	data.Set("repo", repo)
 	data.Set("tags", tags)
 	data.Set("deleteAllowed", deleteAllowed)
-	repoPath, _ = url.PathUnescape(repoPath)
 	data.Set("events", a.eventListener.GetEvents(repoPath))
 
 	return c.Render(http.StatusOK, "tags.html", data)
@@ -216,6 +216,7 @@ func (a *apiClient) viewTagInfo(c echo.Context) error {
 	if namespace != "library" {
 		repoPath = fmt.Sprintf("%s/%s", namespace, repo)
 	}
+        repoPath, _ = url.PathUnescape(repoPath)
 
 	// Retrieve full image info from various versions of manifests
 	sha256, infoV1, infoV2 := a.client.TagInfo(repoPath, tag, false)
@@ -313,6 +314,7 @@ func (a *apiClient) deleteTag(c echo.Context) error {
 	if namespace != "library" {
 		repoPath = fmt.Sprintf("%s/%s", namespace, repo)
 	}
+        repoPath, _ = url.PathUnescape(repoPath)
 
 	if a.checkDeletePermission(c.Request().Header.Get("X-WEBAUTH-USER")) {
 		a.client.DeleteTag(repoPath, tag)
